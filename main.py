@@ -119,4 +119,5 @@ print("waiting for button press")
 while True:
     time.sleep(2.0)
     read_sensor()
+
     time.sleep(FIVE_MINUTES)
