@@ -10,6 +10,7 @@ import binascii
 from machine import Pin
 from dth import DTH
 import ustruct
+import utime
 
 # Colors
 off = 0x000000
@@ -33,10 +34,11 @@ app_key = binascii.unhexlify(appkeys.APP_KEY)
 #print("Disable WLAN");
 #wlan = WLAN()
 #wlan.deinit()
-i2c = I2C(0,)
-oled = ssd1306.SSD1306_I2C(128,64,i2c)
+counter = 0
 
 def send_data(result):
+    print(counter)
+    counter = counter + 1
     print("Temperature: %.1f C" % result.temperature)
     print("Humidity: %.1f %%" % result.humidity)
     
@@ -63,35 +65,25 @@ def pin_handler(arg):
     #display("Sending data..",0,40,False)
     read_sensor()
 
-def display(txt,x,y,clear):
-    ''' Display Text on OLED '''
-
-    if clear:
-        oled.fill(0)
-    oled.text(txt,x,y)
-    oled.show()
 
 
 # Join the network
 print("Try to Join Network ....")
 lora.join(activation=LoRa.OTAA, auth=(app_eui, app_key), timeout=0, dr=0)
 pycom.rgbled(red)
-display("Joining LoRa ...",0,0,True)
+print("Joining LoRa ...")
 
 # Loop until joined
 while not lora.has_joined():
-    print('Not joined yet...')
-    display("Not joined....", 0,0,True)
+    print('Not joined yet...')    
     pycom.rgbled(blue)
     time.sleep(1.0)
     pycom.rgbled(red)
     time.sleep(2.5)
-    display("Not joined..", 0,0,True)
+    
 
 print('Joined')
-display("Joined !", 0,20,True)
 
-display("Sending data..",0,40,False)
 
 pycom.rgbled(off)
 
@@ -119,5 +111,4 @@ print("waiting for button press")
 while True:
     time.sleep(2.0)
     read_sensor()
-
     time.sleep(FIVE_MINUTES)
